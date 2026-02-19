@@ -38,13 +38,13 @@ const register = async (req, res) => {
     if (password.length < 6)
       return res.status(400).json({ message: 'Password must be at least 6 characters' });
 
-    const [existing] = await db.execute('SELECT id FROM auth_users WHERE email = ?', [email]);
+    const [existing] = await db.execute('SELECT id FROM users WHERE email = ?', [email]);
     if (existing.length > 0)
       return res.status(409).json({ message: 'Email already registered' });
 
     const hashedPassword = await bcrypt.hash(password, 12);
     const [result] = await db.execute(
-      'INSERT INTO auth_users (name, email, password) VALUES (?, ?, ?)',
+      'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
       [name, email, hashedPassword]
     );
 
@@ -72,7 +72,7 @@ const login = async (req, res) => {
     if (!email || !password)
       return res.status(400).json({ message: 'Email and password are required' });
 
-    const [rows] = await db.execute('SELECT * FROM auth_users WHERE email = ?', [email]);
+    const [rows] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
     if (rows.length === 0)
       return res.status(401).json({ message: 'Invalid email or password' });
 
@@ -158,7 +158,7 @@ const logout = async (req, res) => {
 const getProfile = async (req, res) => {
   try {
     const [rows] = await db.execute(
-      'SELECT id, name, email, created_at FROM auth_users WHERE id = ?',
+      'SELECT id, name, email, created_at FROM users WHERE id = ?',
       [req.user.id]
     );
     if (rows.length === 0)
