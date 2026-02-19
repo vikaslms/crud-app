@@ -118,7 +118,7 @@ const refreshToken = async (req, res) => {
       return res.status(401).json({ message: 'Refresh token not found or expired' });
 
     const [users] = await db.execute(
-      'SELECT id, name, email FROM auth_users WHERE id = ?', [decoded.id]
+      'SELECT id, name, email FROM users WHERE id = ?', [decoded.id]
     );
     if (users.length === 0)
       return res.status(401).json({ message: 'User not found' });
